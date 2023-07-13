@@ -21,14 +21,14 @@ var (
 	ResourceNameNull            = errors.New("[RNN] resource name is null")
 	ControlPlaneLabel           = "node-role.kubernetes.io/control-plane"
 	defaultRetryInterval        = 10 * time.Second
-	defaultRetryTimeout         = 160 * time.Second
+	defaultRetryTimeout         = 600 * time.Second
 	defaultLongRetryInterval    = 20 * time.Second
-	defaultLongRetryTimeout     = 300 * time.Second
+	defaultLongRetryTimeout     = 900 * time.Second
 	defaultNodeInterval         = 2 * time.Second
 	defaultNodeReadyTimeout     = 20 * time.Minute
 	defaultNodeNotReadyTimeout  = 8 * time.Minute
 	defaultServiceRetryInterval = 10 * time.Second
-	defaultServiceRetryTimeout  = 5 * time.Minute
+	defaultServiceRetryTimeout  = 10 * time.Minute
 )
 
 func waitForServiceExposure(cs kubernetes.Interface, namespace string, name string) (*apiv1.Service, error) {
