@@ -79,7 +79,11 @@ func waitForDeploymentReady(ctx context.Context, k8sClient *kubernetes.Clientset
 		ready := 0
 		for _, pod := range (*podList).Items {
 			if pod.Status.Phase == apiv1.PodRunning {
-				ready++
+				for _, container := range pod.Status.ContainerStatuses {
+					if container.Ready {
+						ready++
+					}
+				}
 			}
 		}
 		if ready < podCount {
