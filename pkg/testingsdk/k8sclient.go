@@ -86,6 +86,11 @@ func waitForDeploymentReady(ctx context.Context, k8sClient *kubernetes.Clientset
 				}
 			}
 		}
+		if podCount == 0 {
+			fmt.Printf("pods are not running yet")
+			return false, nil
+		}
+
 		if ready < podCount {
 			fmt.Printf("running pods: %v < %v\n", ready, podCount)
 			return false, nil
