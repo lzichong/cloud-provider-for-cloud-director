@@ -43,7 +43,7 @@ var _ = Describe("Ensure Loadbalancer", func() {
 	Expect(&tc.Cs).NotTo(BeNil())
 
 	labels := map[string]string{
-		"app": testServiceName,
+		"app": testDeploymentName,
 	}
 
 	httpServicePort := []v1.ServicePort{{
@@ -192,7 +192,7 @@ var _ = Describe("Ensure load balancer with user specified LB IP", func() {
 	Expect(&tc.Cs).NotTo(BeNil())
 
 	labels := map[string]string{
-		"app": testServiceName,
+		"app": testDeploymentName,
 	}
 
 	httpServicePort := []v1.ServicePort{{
