@@ -3,7 +3,7 @@ package e2e
 import (
 	"context"
 	"fmt"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/cloud-provider-for-cloud-director/pkg/testingsdk"
 	"github.com/vmware/cloud-provider-for-cloud-director/pkg/vcdsdk"
@@ -35,9 +35,6 @@ var _ = Describe("Ensure Loadbalancer", func() {
 	)
 
 	tc, err = utils.NewTestClient(host, org, userOrg, ovdcName, username, token, clusterId, false)
-	Expect(err).ShouldNot(HaveOccurred())
-	Expect(tc).NotTo(BeNil())
-	Expect(&tc.Cs).NotTo(BeNil())
 
 	labels := map[string]string{
 		"app": testDeploymentName,
@@ -55,24 +52,25 @@ var _ = Describe("Ensure Loadbalancer", func() {
 
 	// GetConfigMap to retrieve ipamSubnet, network name for gateway manager in order to check if VCD resources are present
 	ccmConfigMap, err := tc.GetConfigMap("kube-system", ccmConfigMapName)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(ccmConfigMap).NotTo(BeNil())
 	ipamSubnet, err = tc.GetIpamSubnetFromConfigMap(ccmConfigMap)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(ipamSubnet).NotTo(BeEmpty())
 	networkName, err = tc.GetNetworkNameFromConfigMap(ccmConfigMap)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(networkName).NotTo(BeEmpty())
 
 	// Gateway Manager is used to validate VCD networking resources
 	gatewayMgr, err := vcdsdk.NewGatewayManager(context.TODO(), tc.VcdClient, networkName, ipamSubnet, ovdcName)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(gatewayMgr).NotTo(BeNil())
 
 	// We can store an unused IP that CPI will fetch to use for comparing external IP being used
 	availableIp, err := gatewayMgr.GetUnusedExternalIPAddress(ctx, ipamSubnet)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(availableIp).NotTo(BeEmpty())
+
+	BeforeEach(func() {
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(tc).NotTo(BeNil())
+		Expect(&tc.Cs).NotTo(BeNil())
+		Expect(ccmConfigMap).NotTo(BeNil())
+		Expect(ipamSubnet).NotTo(BeEmpty())
+		Expect(networkName).NotTo(BeEmpty())
+		Expect(gatewayMgr).NotTo(BeNil())
+		Expect(availableIp).NotTo(BeEmpty())
+	})
 
 	// Case 1. We should be able to create a LB http service on port 80 with no errors
 	It("should create a load balancer service", func() {
@@ -178,9 +176,6 @@ var _ = Describe("Ensure load balancer with user specified LB IP", func() {
 	)
 
 	tc, err = utils.NewTestClient(host, org, userOrg, ovdcName, username, token, clusterId, false)
-	Expect(err).ShouldNot(HaveOccurred())
-	Expect(tc).NotTo(BeNil())
-	Expect(&tc.Cs).NotTo(BeNil())
 
 	labels := map[string]string{
 		"app": testDeploymentName,
@@ -198,27 +193,28 @@ var _ = Describe("Ensure load balancer with user specified LB IP", func() {
 
 	// GetConfigMap to retrieve ipamSubnet, network name for gateway manager in order to check if VCD resources are present
 	ccmConfigMap, err := tc.GetConfigMap("kube-system", ccmConfigMapName)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(ccmConfigMap).NotTo(BeNil())
 	ipamSubnet, err = tc.GetIpamSubnetFromConfigMap(ccmConfigMap)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(ipamSubnet).NotTo(BeEmpty())
 	networkName, err = tc.GetNetworkNameFromConfigMap(ccmConfigMap)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(networkName).NotTo(BeEmpty())
 
 	// Gateway Manager is used to validate VCD networking resources
 	gatewayMgr, err := vcdsdk.NewGatewayManager(context.TODO(), tc.VcdClient, networkName, ipamSubnet, ovdcName)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(gatewayMgr).NotTo(BeNil())
 
 	// TODO: use new govcd function to get the list of available external IPs and avoid using the first available address.
 	// using the first available external IP to test user specified load balancer IP is not ideal because, if CPI fails to
 	// read the user specified IP address, the first available external IP address will be used for the load balancer. This needs to be
 	// fixed by utilizing govcd's implementation to fetch all the unused external IP.
 	explicitIP, err := gatewayMgr.GetUnusedExternalIPAddress(ctx, ipamSubnet)
-	Expect(err).NotTo(HaveOccurred())
-	Expect(explicitIP).NotTo(BeEmpty())
+
+	BeforeEach(func() {
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(tc).NotTo(BeNil())
+		Expect(&tc.Cs).NotTo(BeNil())
+		Expect(ccmConfigMap).NotTo(BeNil())
+		Expect(ipamSubnet).NotTo(BeEmpty())
+		Expect(networkName).NotTo(BeEmpty())
+		Expect(gatewayMgr).NotTo(BeNil())
+		Expect(explicitIP).NotTo(BeEmpty())
+	})
 
 	// Case 1. We should be able to create a LB http service on port 80, using a user specifie load balancer IP with no errors
 	It("should create a load balancer service", func() {

@@ -3,7 +3,7 @@ package kubeconfig_test
 import (
 	"context"
 	"fmt"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/cloud-provider-for-cloud-director/pkg/testingsdk"
 	"github.com/vmware/cloud-provider-for-cloud-director/pkg/vcdsdk"
@@ -19,14 +19,14 @@ var _ = Describe("Fetch Kubeconfig from RDE", func() {
 	)
 
 	vcdClient, err = vcdsdk.NewVCDClientFromSecrets(host, org, ovdcName, userOrg, username, "", token, true, false)
-	Expect(err).ShouldNot(HaveOccurred())
-	Expect(vcdClient).NotTo(BeNil())
+	BeforeEach(func() {
+		Expect(vcdClient).NotTo(BeNil())
+	})
 
 	It("should be able to fetch kubeconfig from RDE ID", func() {
 		kubeConfig, err = testingsdk.GetKubeconfigFromRDEId(context.TODO(), vcdClient, clusterId)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(kubeConfig).NotTo(BeEmpty())
-
 	})
 
 	It("should be able to write a kubeconfig file to output path", func() {
