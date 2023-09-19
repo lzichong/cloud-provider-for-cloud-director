@@ -3,7 +3,7 @@ package e2e
 import (
 	"context"
 	"fmt"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vmware/cloud-provider-for-cloud-director/pkg/testingsdk"
 	"github.com/vmware/cloud-provider-for-cloud-director/pkg/vcdsdk"
@@ -18,25 +18,27 @@ var _ = Describe("Node LCM", func() {
 		workerNode             *v1.Node
 		tc                     *testingsdk.TestClient
 		deleteTestSpecExecuted bool
+		vdcManager             *vcdsdk.VdcManager
 	)
 
-	tc, err = utils.NewTestClient(host, org, userOrg, ovdcName, username, token, clusterId, true)
-	Expect(err).ShouldNot(HaveOccurred())
-	Expect(tc).NotTo(BeNil())
-	Expect(&tc.Cs).NotTo(BeNil())
 	ctx := context.TODO()
 
 	BeforeEach(func() {
+		tc, err = utils.NewTestClient(host, org, userOrg, ovdcName, username, token, clusterId, true)
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(tc).NotTo(BeNil())
+		Expect(&tc.Cs).NotTo(BeNil())
+
 		workerNodes, err := tc.GetWorkerNodes(ctx)
 		Expect(err).ShouldNot(HaveOccurred(), fmt.Sprintf("error occurred while fetching list of worker nodes: [%v]", err))
 		if !deleteTestSpecExecuted && len(workerNodes) < 2 {
 			Skip("Skipping Node LCM test case as this cluster does not have 2 or more worker nodes")
 		}
-	})
 
-	vdcManager, err := vcdsdk.NewVDCManager(tc.VcdClient, org, ovdcName)
-	Expect(err).ShouldNot(HaveOccurred())
-	Expect(vdcManager).NotTo(BeNil())
+		vdcManager, err = vcdsdk.NewVDCManager(tc.VcdClient, org, ovdcName)
+		Expect(err).ShouldNot(HaveOccurred())
+		Expect(vdcManager).NotTo(BeNil())
+	})
 
 	It("should stop a worker VM in VCD", func() {
 		By("ensuring that vApp exists")
