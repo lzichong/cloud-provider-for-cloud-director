@@ -2,7 +2,6 @@ package e2e
 
 import (
 	"flag"
-	"os"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -55,12 +54,13 @@ var _ = BeforeSuite(func() {
 	// isMultiAZ will default to "false"
 
 	// AIRGAP environment variable is expected to be set in jenkins or by user via `export AIRGAP="true"`
-	useAirgap := os.Getenv("AIRGAP")
-	if useAirgap != "" {
-		ContainerImage = airgappedImage
-	} else {
-		ContainerImage = stagingImage
-	}
+	//useAirgap := os.Getenv("AIRGAP")
+	//if useAirgap != "" {
+	//	ContainerImage = airgappedImage
+	//} else {
+	//	ContainerImage = stagingImage
+	//}
+	ContainerImage = stagingImage
 })
 
 func TestE2e(t *testing.T) {
